@@ -94,7 +94,6 @@ func (request *httpRequest) parseHttpFieldsAndPopulateRequestConfig(prefix strin
 	case "Content-Type":
 		request.ContentType = value
 	default:
-
 		request.AdditionalHeaders[prefix] = value
 	}
 

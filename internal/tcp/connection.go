@@ -2,6 +2,7 @@ package tcp
 
 import (
 	"bufio"
+	"github.com/kr/pretty"
 	"io"
 	"log"
 	"net"
@@ -41,7 +42,11 @@ func handleConnection(conn net.Conn, timeoutInt int) error {
 	if err != nil {
 		log.Printf("Failed to read the body of the request for conn: %v, err: %v", conn.RemoteAddr(), err)
 	}
-	log.Printf("BODY VALUE COLLECTED: %v", string(bodyBuffer))
+
+	requestConfig.Body = string(bodyBuffer)
+
+	log.Printf("Request Config Struct: \n\n %# v", pretty.Formatter(requestConfig))
+
 	connectionError := conn.Close()
 	log.Printf("Closing connection: %v", conn.RemoteAddr())
 	if connectionError != nil {
