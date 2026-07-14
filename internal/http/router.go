@@ -19,12 +19,6 @@ type Router struct {
 	address            string
 }
 
-type routeConfig struct {
-	method         HttpMethod
-	path           string
-	routerFunction func()
-}
-
 func CreateNewRouter(newAddress string) *Router {
 	router := Router{
 		address: newAddress,
@@ -34,7 +28,7 @@ func CreateNewRouter(newAddress string) *Router {
 	return &router
 }
 
-func (router *Router) verifyRouterExistence(request *HttpRequest) (error, int) {
+func (router *Router) verifyRouteExistence(request *HttpRequest) (error, int) {
 	router.mu.RLock()
 	if router.routerFunctionMaps[request.Path] == nil {
 		return fmt.Errorf("Not Found"), 404
@@ -47,14 +41,14 @@ func (router *Router) verifyRouterExistence(request *HttpRequest) (error, int) {
 	return nil, -1
 }
 
-func (router *Router) RegisterNewRoute(routeConfig *routeConfig) {
+func (router *Router) RegisterNewRoute(path string, method HttpMethod, routerFunc func()) {
 	router.mu.Lock()
 	defer router.mu.Unlock()
-	if router.routerFunctionMaps[routeConfig.path] == nil {
-		router.routerFunctionMaps[routeConfig.path] = make(map[string]func())
+	if router.routerFunctionMaps[path] == nil {
+		router.routerFunctionMaps[path] = make(map[string]func())
 	}
 
-	router.routerFunctionMaps[routeConfig.path][string(routeConfig.method)] = routeConfig.routerFunction
+	router.routerFunctionMaps[path][string(method)] = routerFunc
 }
 
 func (router *Router) CreateAndRunListener(method string, address string, defaultTimeout int) error {
@@ -79,7 +73,7 @@ func (router *Router) CreateAndRunListener(method string, address string, defaul
 
 func (router *Router) Serve(httpRequest *HttpRequest) HttpResponse {
 	httpResponse := CreateNewHttpResponse()
-	err, errorResponseCode := router.verifyRouterExistence(httpRequest)
+	err, errorResponseCode := router.verifyRouteExistence(httpRequest)
 	if err != nil {
 		httpResponse.StatusCode = errorResponseCode
 		httpResponse.StatusString = err.Error()
