@@ -19,9 +19,10 @@ const (
 	OPTIONS HttpMethod = "OPTIONS"
 )
 
-type httpRequest struct {
+type HttpRequest struct {
 	Connection        string
 	Method            HttpMethod
+	Path              string
 	ContentLength     int
 	Host              string
 	AcceptEncoding    []string
@@ -54,15 +55,21 @@ var VALID_HTTP_METHODS = []HttpMethod{
 // Connection: keep-alive
 // Content-Length: 10
 
-func CreateNewHttpRequest() *httpRequest {
-	httpRequest := httpRequest{}
-	httpRequest.AdditionalHeaders = make(map[string]string)
-	return &httpRequest
+func CreateNewHttpRequest() *HttpRequest {
+	HttpRequest := HttpRequest{}
+	HttpRequest.AdditionalHeaders = make(map[string]string)
+	return &HttpRequest
 }
 
-func (request *httpRequest) checkHttpMethodLineAndPopulate(line string) bool {
+func (request *HttpRequest) checkHttpMethodLineAndPopulate(line string) bool {
 	for _, method := range VALID_HTTP_METHODS {
 		if strings.HasPrefix(line, string(method)) {
+			suffix, _ := strings.CutPrefix(line, string(method))
+			suffix = strings.TrimSpace(suffix)
+			firstSlash := strings.Index(suffix, "/")
+			firstSpace := strings.Index(suffix, " ")
+			path := suffix[firstSlash : firstSpace+1]
+			request.Path = path
 			request.Method = method
 			return true
 		}
@@ -70,7 +77,7 @@ func (request *httpRequest) checkHttpMethodLineAndPopulate(line string) bool {
 	return false
 }
 
-func (request *httpRequest) parseHttpFieldsAndPopulateRequestConfig(prefix string, value string) {
+func (request *HttpRequest) parseHttpFieldsAndPopulateRequestConfig(prefix string, value string) {
 	switch prefix {
 	case "Accept":
 		request.Accept = value
@@ -99,7 +106,7 @@ func (request *httpRequest) parseHttpFieldsAndPopulateRequestConfig(prefix strin
 
 }
 
-func (request *httpRequest) ParseStringPerLinePopulateStruct(line string) {
+func (request *HttpRequest) ParseStringPerLinePopulateStruct(line string) {
 	line = strings.TrimSpace(line)
 	methodResult := request.checkHttpMethodLineAndPopulate(line)
 

@@ -1,4 +1,4 @@
-package tcp
+package http
 
 import (
 	"bufio"
@@ -10,7 +10,7 @@ import (
 	"time"
 )
 
-func HandleConnection(conn net.Conn, timeoutInt int) error {
+func (router *Router) HandleConnection(conn net.Conn, timeoutInt int) error {
 	log.Printf("New Connection: %v", conn.RemoteAddr())
 	defer conn.Close()
 
@@ -20,7 +20,7 @@ func HandleConnection(conn net.Conn, timeoutInt int) error {
 	conn.SetDeadline(time.Now().Add(timeout))
 
 	reader := bufio.NewReader(conn)
-	requestConfig := http.CreateNewHttpRequest()
+	requestConfig := CreateNewHttpRequest()
 	for {
 		message, err := reader.ReadBytes('\n')
 		if strings.TrimSpace(string(message)) == "" {
@@ -42,9 +42,15 @@ func HandleConnection(conn net.Conn, timeoutInt int) error {
 	}
 
 	requestConfig.Body = string(bodyBuffer)
-
 	log.Printf("Request Config Struct: \n\n %# v", pretty.Formatter(requestConfig))
+	httpResponse := router.Serve(requestConfig)
+	log.Printf("Response Config Struct: \n\n %# v", pretty.Formatter(httpResponse))
 
+	serializedResponse := httpResponse.serializeHttpResponseIntoString()
+	_, err = conn.Write(serializedResponse)
+	if err != nil {
+		log.Printf("Error writing response to connection: %v", conn)
+	}
 	connectionError := conn.Close()
 	log.Printf("Closing connection: %v", conn.RemoteAddr())
 	if connectionError != nil {
