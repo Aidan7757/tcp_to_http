@@ -61,7 +61,6 @@ func (response *HttpResponse) serializeHttpResponseIntoString() []byte {
 
 	formatWithPlacements := fmt.Sprintf(formatString, response.StatusCode, response.StatusString,
 		response.Date, response.ContentType, response.ContentLength, string(jsonBytes))
-	log.Printf("Format with placements: %v", formatWithPlacements)
 
 	bytes := []byte(formatWithPlacements)
 	return bytes

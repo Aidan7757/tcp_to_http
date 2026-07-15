@@ -2,7 +2,6 @@ package http
 
 import (
 	"bufio"
-	"github.com/kr/pretty"
 	"io"
 	"log"
 	"net"
@@ -43,7 +42,6 @@ func (router *Router) HandleConnection(conn net.Conn, timeoutInt int) error {
 
 	requestConfig.Body = string(bodyBuffer)
 	httpResponse := router.Serve(requestConfig)
-	log.Printf("Response Config Struct: \n\n %# v", pretty.Formatter(httpResponse))
 
 	serializedResponse := httpResponse.serializeHttpResponseIntoString()
 	_, err = conn.Write(serializedResponse)

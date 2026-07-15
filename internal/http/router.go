@@ -137,7 +137,6 @@ func (router *Router) Serve(httpRequest *HttpRequest) HttpResponse {
 			httpResponse.StatusString = "Bad Request"
 			return *httpResponse
 		}
-		log.Printf("JSON Request Body: %+v", createTableRouteBody)
 		route.RouterFunc(createTableRouteBody, httpResponse)
 	}
 	if route.RouteType == SetRoute {
@@ -170,11 +169,9 @@ func (router *Router) Serve(httpRequest *HttpRequest) HttpResponse {
 			httpResponse.StatusString = "Bad Request"
 			return *httpResponse
 		}
-		log.Printf("JSON Request Body: %+v", setRouteBody)
 		route.RouterFunc(setRouteBody, httpResponse)
 	}
 	if route.RouteType == QueryRoute {
-		log.Printf("in query body route")
 		var queryRouteBody QueryRouteBody
 		err := json.Unmarshal([]byte(httpRequest.Body), &queryRouteBody)
 		if err != nil {
@@ -191,7 +188,6 @@ func (router *Router) Serve(httpRequest *HttpRequest) HttpResponse {
 			return *httpResponse
 		}
 
-		log.Printf("here")
 		if queryRouteBody.Key == nil {
 			httpResponse.Body = ErrorResponseBody{Error: "No key field included."}
 			httpResponse.StatusCode = 400
@@ -205,9 +201,7 @@ func (router *Router) Serve(httpRequest *HttpRequest) HttpResponse {
 			httpResponse.StatusString = "Bad Request"
 			return *httpResponse
 		}
-		log.Printf("JSON Request Body: %+v", queryRouteBody)
 		route.RouterFunc(queryRouteBody, httpResponse)
-		log.Printf("HttpResponse Body: %+v", *httpResponse)
 	}
 
 	return *httpResponse

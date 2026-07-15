@@ -1,10 +1,10 @@
 package main
 
 import (
-	"log"
 	"tcp_to_http/internal/http"
 )
 
+// Fake query function - will be replaced with the DB calls once it is implemented
 func queryCallBackFunc(body any, httpResponse *http.HttpResponse) (int, error) {
 	fakeQueryValues := make(map[string]any)
 	fakeQueryValues["test_key"] = "test_value"
@@ -16,7 +16,6 @@ func queryCallBackFunc(body any, httpResponse *http.HttpResponse) (int, error) {
 
 	httpResponse.Body = responseBody
 	httpResponse.StatusCode = 200
-	log.Printf("Response Body HTTP: %+v", httpResponse)
 	return 200, nil
 }
 
