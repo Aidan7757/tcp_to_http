@@ -1,10 +1,11 @@
 package main
 
 import (
+	"log"
 	"tcp_to_http/internal/http"
 )
 
-func queryCallBackFunc(body any, httpResponse http.HttpResponse) (int, error) {
+func queryCallBackFunc(body any, httpResponse *http.HttpResponse) (int, error) {
 	fakeQueryValues := make(map[string]any)
 	fakeQueryValues["test_key"] = "test_value"
 	fakeResultValues := []bool{true}
@@ -14,7 +15,8 @@ func queryCallBackFunc(body any, httpResponse http.HttpResponse) (int, error) {
 	responseBody.Result = fakeResultValues
 
 	httpResponse.Body = responseBody
-
+	httpResponse.StatusCode = 200
+	log.Printf("Response Body HTTP: %+v", httpResponse)
 	return 200, nil
 }
 

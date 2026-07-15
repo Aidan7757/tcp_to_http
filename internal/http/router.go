@@ -16,7 +16,7 @@ type CreateTableRouteBody struct {
 
 type QueryRouteBody struct {
 	TableName *string `json:"table_name"`
-	Column    *string `json:"column_name"`
+	Column    *string `json:"column"`
 	Key       *any    `json:"key"`
 }
 
@@ -36,7 +36,7 @@ const (
 )
 
 type Route struct {
-	RouterFunc func(body any, httpResponse HttpResponse) (int, error)
+	RouterFunc func(body any, httpResponse *HttpResponse) (int, error)
 	RouteType  RouteType
 }
 
@@ -138,7 +138,7 @@ func (router *Router) Serve(httpRequest *HttpRequest) HttpResponse {
 			return *httpResponse
 		}
 		log.Printf("JSON Request Body: %+v", createTableRouteBody)
-		route.RouterFunc(createTableRouteBody, *httpResponse)
+		route.RouterFunc(createTableRouteBody, httpResponse)
 	}
 	if route.RouteType == SetRoute {
 		var setRouteBody SetRouteBody
@@ -171,7 +171,7 @@ func (router *Router) Serve(httpRequest *HttpRequest) HttpResponse {
 			return *httpResponse
 		}
 		log.Printf("JSON Request Body: %+v", setRouteBody)
-		route.RouterFunc(setRouteBody, *httpResponse)
+		route.RouterFunc(setRouteBody, httpResponse)
 	}
 	if route.RouteType == QueryRoute {
 		log.Printf("in query body route")
@@ -206,10 +206,9 @@ func (router *Router) Serve(httpRequest *HttpRequest) HttpResponse {
 			return *httpResponse
 		}
 		log.Printf("JSON Request Body: %+v", queryRouteBody)
-		route.RouterFunc(queryRouteBody, *httpResponse)
+		route.RouterFunc(queryRouteBody, httpResponse)
 		log.Printf("HttpResponse Body: %+v", *httpResponse)
 	}
 
-	// need to implement the working route execution rather than just failing to find
 	return *httpResponse
 }

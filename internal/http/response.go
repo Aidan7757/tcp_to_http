@@ -31,7 +31,6 @@ type ErrorResponseBody struct {
 type HttpResponse struct {
 	StatusCode    int
 	StatusString  string
-	Method        HttpMethod
 	Date          string
 	ContentType   string
 	ContentLength int
