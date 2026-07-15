@@ -35,18 +35,6 @@ type HttpRequest struct {
 	AdditionalHeaders map[string]string
 }
 
-// POST / HTTP/1.1
-// Test: Hello
-// Content-Type: text/plain
-// User-Agent: PostmanRuntime/7.54.0
-// Accept: */*
-// Cache-Control: no-cache
-// Postman-Token: 9220833d-6f7b-4fc6-b898-876fc2ce4530
-// Host: localhost:8080
-// Accept-Encoding: gzip, deflate, br
-// Connection: keep-alive
-// Content-Length: 10
-
 func CreateNewHttpRequest() *HttpRequest {
 	HttpRequest := HttpRequest{}
 	HttpRequest.AdditionalHeaders = make(map[string]string)
