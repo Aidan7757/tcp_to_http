@@ -42,7 +42,6 @@ func (router *Router) HandleConnection(conn net.Conn, timeoutInt int) error {
 	}
 
 	requestConfig.Body = string(bodyBuffer)
-	log.Printf("Request Config Struct: \n\n %# v", pretty.Formatter(requestConfig))
 	httpResponse := router.Serve(requestConfig)
 	log.Printf("Response Config Struct: \n\n %# v", pretty.Formatter(httpResponse))
 
@@ -52,7 +51,6 @@ func (router *Router) HandleConnection(conn net.Conn, timeoutInt int) error {
 	if err != nil {
 		log.Printf("Error writing HTTP header response: %v to connection: %v", serializedResponse, conn)
 	}
-
 	connectionError := conn.Close()
 	log.Printf("Closing connection: %v", conn.RemoteAddr())
 	if connectionError != nil {

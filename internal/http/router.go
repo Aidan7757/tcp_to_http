@@ -36,7 +36,7 @@ const (
 )
 
 type Route struct {
-	RouterFunc func(body *any) any
+	RouterFunc func(body any, httpResponse HttpResponse) (int, error)
 	RouteType  RouteType
 }
 
@@ -113,8 +113,8 @@ func (router *Router) Serve(httpRequest *HttpRequest) HttpResponse {
 	}
 	route := router.routerFunctionMaps[httpRequest.Path][string(httpRequest.Method)]
 
-	log.Printf("ROUTE ROUTE TYPE: %+v", route.RouteType)
-	if route.RouteType == SetRoute {
+	// I hate this but Go doesnt allow for implicit json marshal -> struct field verification error returning
+	if route.RouteType == CreateTableRoute {
 		var createTableRouteBody CreateTableRouteBody
 		err := json.Unmarshal([]byte(httpRequest.Body), &createTableRouteBody)
 		if err != nil {
@@ -138,6 +138,7 @@ func (router *Router) Serve(httpRequest *HttpRequest) HttpResponse {
 			return *httpResponse
 		}
 		log.Printf("JSON Request Body: %+v", createTableRouteBody)
+		route.RouterFunc(createTableRouteBody, *httpResponse)
 	}
 	if route.RouteType == SetRoute {
 		var setRouteBody SetRouteBody
@@ -170,8 +171,10 @@ func (router *Router) Serve(httpRequest *HttpRequest) HttpResponse {
 			return *httpResponse
 		}
 		log.Printf("JSON Request Body: %+v", setRouteBody)
+		route.RouterFunc(setRouteBody, *httpResponse)
 	}
 	if route.RouteType == QueryRoute {
+		log.Printf("in query body route")
 		var queryRouteBody QueryRouteBody
 		err := json.Unmarshal([]byte(httpRequest.Body), &queryRouteBody)
 		if err != nil {
@@ -188,6 +191,7 @@ func (router *Router) Serve(httpRequest *HttpRequest) HttpResponse {
 			return *httpResponse
 		}
 
+		log.Printf("here")
 		if queryRouteBody.Key == nil {
 			httpResponse.Body = ErrorResponseBody{Error: "No key field included."}
 			httpResponse.StatusCode = 400
@@ -202,6 +206,8 @@ func (router *Router) Serve(httpRequest *HttpRequest) HttpResponse {
 			return *httpResponse
 		}
 		log.Printf("JSON Request Body: %+v", queryRouteBody)
+		route.RouterFunc(queryRouteBody, *httpResponse)
+		log.Printf("HttpResponse Body: %+v", *httpResponse)
 	}
 
 	// need to implement the working route execution rather than just failing to find

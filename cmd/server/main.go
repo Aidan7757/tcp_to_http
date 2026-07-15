@@ -4,10 +4,18 @@ import (
 	"tcp_to_http/internal/http"
 )
 
-func queryCallBackFunc(body *any) any {
-
+func queryCallBackFunc(body any, httpResponse http.HttpResponse) (int, error) {
+	fakeQueryValues := make(map[string]any)
+	fakeQueryValues["test_key"] = "test_value"
+	fakeResultValues := []bool{true}
 	responseBody := http.QueryResponseBody{}
-	return responseBody
+
+	responseBody.QueriedValues = fakeQueryValues
+	responseBody.Result = fakeResultValues
+
+	httpResponse.Body = responseBody
+
+	return 200, nil
 }
 
 func main() {
