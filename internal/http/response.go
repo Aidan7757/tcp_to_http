@@ -38,6 +38,7 @@ type HttpResponse struct {
 }
 
 func (response *HttpResponse) serializeHttpResponseIntoString() []byte {
+
 	formatString := "HTTP/1.1 %v %v\r\n" +
 		"Date: %v\r\n" +
 		"Content-Type: %v; charset=UTF-8\r\n" +
