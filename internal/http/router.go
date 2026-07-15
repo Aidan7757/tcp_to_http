@@ -14,7 +14,7 @@ type RouteError struct {
 }
 
 type Router struct {
-	routerFunctionMaps map[string]map[string]func()
+	routerFunctionMaps map[string]map[string]any
 	mu                 sync.RWMutex
 	address            string
 }
@@ -23,7 +23,7 @@ func CreateNewRouter(newAddress string) *Router {
 	router := Router{
 		address: newAddress,
 	}
-	router.routerFunctionMaps = make(map[string]map[string]func())
+	router.routerFunctionMaps = make(map[string]map[string]any)
 	router.CreateAndRunListener("tcp", newAddress, 10)
 	return &router
 }
@@ -41,11 +41,11 @@ func (router *Router) verifyRouteExistence(request *HttpRequest) (error, int) {
 	return nil, -1
 }
 
-func (router *Router) RegisterNewRoute(path string, method HttpMethod, routerFunc func()) {
+func (router *Router) RegisterNewRoute(path string, method HttpMethod, routerFunc any) {
 	router.mu.Lock()
 	defer router.mu.Unlock()
 	if router.routerFunctionMaps[path] == nil {
-		router.routerFunctionMaps[path] = make(map[string]func())
+		router.routerFunctionMaps[path] = make(map[string]any)
 	}
 
 	router.routerFunctionMaps[path][string(method)] = routerFunc
@@ -77,6 +77,12 @@ func (router *Router) Serve(httpRequest *HttpRequest) HttpResponse {
 	if err != nil {
 		httpResponse.StatusCode = errorResponseCode
 		httpResponse.StatusString = err.Error()
+		return *httpResponse
 	}
+
+	// if route is verified then execute callback function in route map, next challenge is handling route params and
+	// body / query params
+	callbackFunc := router.routerFunctionMaps[httpRequest.Path][string(httpRequest.Method)]
+	callbackFunc()
 	return *httpResponse
 }

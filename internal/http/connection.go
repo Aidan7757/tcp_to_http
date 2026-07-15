@@ -48,9 +48,11 @@ func (router *Router) HandleConnection(conn net.Conn, timeoutInt int) error {
 
 	serializedResponse := httpResponse.serializeHttpResponseIntoString()
 	_, err = conn.Write(serializedResponse)
+
 	if err != nil {
 		log.Printf("Error writing response to connection: %v", conn)
 	}
+
 	connectionError := conn.Close()
 	log.Printf("Closing connection: %v", conn.RemoteAddr())
 	if connectionError != nil {
