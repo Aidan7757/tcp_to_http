@@ -9,15 +9,18 @@ import (
 type HttpMethod string
 
 const (
-	GET     HttpMethod = "GET"
-	SET     HttpMethod = "SET"
-	POST    HttpMethod = "POST"
-	DELETE  HttpMethod = "DELETE"
-	PUT     HttpMethod = "PUT"
-	PATCH   HttpMethod = "PATCH"
-	HEAD    HttpMethod = "HEAD"
-	OPTIONS HttpMethod = "OPTIONS"
+	SET    HttpMethod = "SET"
+	DELETE HttpMethod = "DELETE"
+	QUERY  HttpMethod = "QUERY"
+	POST   HttpMethod = "POST"
 )
+
+var VALID_HTTP_METHODS = []HttpMethod{
+	POST,
+	DELETE,
+	SET,
+	QUERY,
+}
 
 type HttpRequest struct {
 	Connection        string
@@ -30,17 +33,6 @@ type HttpRequest struct {
 	ContentType       string
 	Body              string
 	AdditionalHeaders map[string]string
-}
-
-var VALID_HTTP_METHODS = []HttpMethod{
-	GET,
-	POST,
-	PUT,
-	DELETE,
-	SET,
-	PATCH,
-	HEAD,
-	OPTIONS,
 }
 
 // POST / HTTP/1.1
@@ -69,7 +61,7 @@ func (request *HttpRequest) checkHttpMethodLineAndPopulate(line string) bool {
 			firstSlash := strings.Index(suffix, "/")
 			firstSpace := strings.Index(suffix, " ")
 			path := suffix[firstSlash : firstSpace+1]
-			request.Path = path
+			request.Path = strings.TrimSpace(path)
 			request.Method = method
 			return true
 		}

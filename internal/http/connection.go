@@ -50,7 +50,7 @@ func (router *Router) HandleConnection(conn net.Conn, timeoutInt int) error {
 	_, err = conn.Write(serializedResponse)
 
 	if err != nil {
-		log.Printf("Error writing response to connection: %v", conn)
+		log.Printf("Error writing HTTP header response: %v to connection: %v", serializedResponse, conn)
 	}
 
 	connectionError := conn.Close()
