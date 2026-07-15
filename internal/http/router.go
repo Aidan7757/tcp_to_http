@@ -82,7 +82,6 @@ func (router *Router) Serve(httpRequest *HttpRequest) HttpResponse {
 
 	// if route is verified then execute callback function in route map, next challenge is handling route params and
 	// body / query params
-	callbackFunc := router.routerFunctionMaps[httpRequest.Path][string(httpRequest.Method)]
-	callbackFunc()
+	// callbackFunc := router.routerFunctionMaps[httpRequest.Path][string(httpRequest.Method)]
 	return *httpResponse
 }
